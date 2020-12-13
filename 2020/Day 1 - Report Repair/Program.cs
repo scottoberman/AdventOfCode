@@ -1,89 +1,69 @@
 ﻿using System;
 using System.IO;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace Day_1___Report_Repair
 {
     class TheGoods
     {
-        private static List<int> lEntries;
-        private static int nSumTarget;
-        private static int nDepthTarget;
         static void Main(string[] args)
         {
             // We don't handle exceptions here, yeah!
-            nSumTarget = Int32.Parse(args[0]);
-            nDepthTarget = Int32.Parse(args[1]);
-            StreamReader srEntries = new StreamReader(args[2]);
-            lEntries = new List<int>();
+            int nSumTarget = Int32.Parse(args[0]);
+            StreamReader srEntries = new StreamReader(args[1]);
+            List<int> ssEntries = new List<int>();
             string sLine;
 
             while ((sLine = srEntries.ReadLine()) != null)
-                lEntries.Add(Int32.Parse(sLine));
+                ssEntries.Add(Int32.Parse(sLine));
 
             // Having sorted elements means we can halt
             // the check process short if the sum
-            // is greater than our target of 2020 (or any other target).
-            lEntries.Sort();
+            // is greater than our target of 2020.
+            ssEntries.Sort();
 
             // Now find the sum.
-            FindTargetSum();
-
-        }
-
-        private static int FindTargetSum()
-        {
-            List<int> aPotentialAdds = new List<int>();
-            if (EntrySum(0, 0, nDepthTarget, nSumTarget,  aPotentialAdds, 0))
+            bool bSumFound = false;
+            int nSum = 0;
+            int nIndex1 = 0;
+            int nIndex2 = 0;
+            int nIndex3 = 0;
+            int nAdd1 = 0;
+            int nAdd2 = 0;
+            int nAdd3 = 0;
+            int acc = 0;
+            // Index will be the lhs of any sum (so limit index to be one less than
+            // end of entries).
+            while (!bSumFound && nIndex1 < ssEntries.Count - 2)
             {
-                Console.Write
-($@"Components of sum target {nSumTarget} found: {aPotentialAdds} 
-Their Product is: { aPotentialAdds.Aggregate(1, (lhs, rhs)=> lhs * rhs) }");
+                nIndex2 = nIndex1 + 1;
+                while (!bSumFound && nIndex2 < ssEntries.Count - 1)
+                {
+                    nIndex3 = nIndex2 + 1;
+                    while (!bSumFound && nIndex3 < ssEntries.Count)
+                    {
+                        nAdd1 = ssEntries[nIndex1];
+                        nAdd2 = ssEntries[nIndex2];
+                        nAdd3 = ssEntries[nIndex3];
+
+                        nSum = nAdd1 + nAdd2 + nAdd3;
+
+                        bSumFound = nSum == nSumTarget;
+
+                        nIndex3++;
+                        acc++;
+                    }
+                    nIndex2++;
+                }
+                nIndex1++;
             }
+
+            if (nSum == nSumTarget)
+                Console.WriteLine
+(@"Components of sum target " + nSumTarget + " found: " + nAdd1 + ", " + nAdd2 + ", and " + nAdd3 +
+"Their Product is: " + nAdd1 * nAdd2 * nAdd3);
             else
                 Console.WriteLine("Components of sum target " + nSumTarget + " not found.");
-            return 0;
-        }
-
-        private static bool EntrySum(int nIndexStart, int nDepth, int nDepthTarget, int nSumTarget,  List<int> aPotentialAdds, int nSum)
-        {
-            int nIndexNext = nIndexStart + 1;
-            int nDepthNext = nDepth + 1;
-
-            nDepth--;
-
-            int nEntry = lEntries[nIndexStart];
-
-            aPotentialAdds.Add(nEntry);
-            nSum += nEntry;
-            // Find sum if at depth target
-            if (nDepth == nDepthTarget)
-            {
-#if DEBUG
-                Console.WriteLine($"INDEX: {nIndexStart} DEPTH: {nDepth} SUM: {nSum} ELEMENTS: {String.Join(",", aPotentialAdds)}");
-#endif
-                if (nSum == nSumTarget)
-                    return true;
-            }
-            else
-            {
-                while (nIndexNext < lEntries.Count)
-                {
-
-                    if (nSum <= nSumTarget &&
-                        EntrySum(nIndexNext, nDepthNext, nDepthTarget, nSumTarget,  aPotentialAdds, nSum))
-                        return true;
-                    else
-                        nIndexNext++;
-                    int x = 1;
-                }
-            }
-
-            nSum -= nEntry;
-            aPotentialAdds.RemoveAt(nDepth + 1);
-            return false;
-                
         }
     }
 }
