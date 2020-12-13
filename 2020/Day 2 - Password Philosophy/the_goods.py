@@ -18,7 +18,7 @@ class rule:
                      ((self.password[self.countLow - 1]  == self.letter) ^
                      (self.password[self.countHigh - 1] == self.letter)))
 def main():
-    file = open(r'D:\Users\scott\Desktop\paswordadvententries.txt')
+    file = open(argv[1])
     entries = file.readlines()
     rules = []
 
